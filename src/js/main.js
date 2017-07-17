@@ -1,27 +1,41 @@
 var candidates;
 
-// function addEventListeners() {
-// 	var checkboxes = document.getElementsByClassName('checkbox');
-// 	for (var i = 0; i < checkboxes.length; i++) {
-// 		checkboxes[i].parentElement.addEventListener('click', toggleCheckbox);
-// 	}
-// }
+function selectCheckbox() {
+	var checkbox = this;
+	var checkboxContainer = this.parentElement;
 
-function toggleCheckbox() {
-	var ballotContainer = this.parentElement;
-	var candidatePoints = this.dataset.points - 0;
-
-	if (!this.classList.contains('active') && ballotContainer.dataset.selectionMade == 'false') {
-		this.classList.add('active');
-		candidatePoints += 1;
-		this.setAttribute('data-points', candidatePoints);
-		ballotContainer.setAttribute('data-selection-made', true);
-	} else if (this.classList.contains('active')) {
-		this.classList.remove('active');
-		ballotContainer.setAttribute('data-selection-made', false);
-		candidatePoints = 0;
-		this.setAttribute('data-points', candidatePoints);
+	if (checkboxContainer.dataset.selectionMade == 'false') {
+		this.classList.add("active");
+		checkboxContainer.setAttribute("data-selection-made", true);
+	} else if (checkboxContainer.dataset.selectionMade == 'true') {
+		clearCheckboxes(checkboxContainer);
+		this.classList.add("active");
 	}
+
+	if (checkboxContainer.classList.contains("fptp")) {
+		toggleCheckbox(this);	
+	}
+}
+
+function clearCheckboxes(checkboxContainer) {	
+	for (var i = 0; i < checkboxContainer.children.length; i++) {
+		var currentCheckbox = checkboxContainer.children[i];
+		if (currentCheckbox.classList.contains("active")) {
+			currentCheckbox.classList.remove("active");
+		}
+	}
+}
+
+function toggleCheckbox(checkbox) {
+	var checkboxContainer = checkbox.parentElement;
+	for (var i = 0; i < checkboxContainer.children.length; i++) {
+		var currentCheckbox = checkboxContainer.children[i];
+		if (currentCheckbox.dataset.points = 1) {
+			currentCheckbox.setAttribute("data-points", 0)
+		}
+	}
+
+	checkbox.setAttribute("data-points", 1);
 }
 
 function ballotSetup() {
@@ -71,7 +85,7 @@ function ballotSetup() {
 
 			if (ballot.classList.contains('fptp')) {
 				addSingleCheckbox(candidateContainer);
-				candidateContainer.addEventListener("click", toggleCheckbox);
+				candidateContainer.addEventListener("click", selectCheckbox);
 			}
 
 			ballot.appendChild(candidateContainer);
@@ -98,7 +112,7 @@ function ballotSetup() {
 				currentCheckbox.setAttribute("data-points", points);
 				currentCheckbox.classList.add("range-checkbox");
 				currentCheckbox.innerHTML = points;
-				//currentCheckbox.addEventListener("click", "rangeCheckboxListener");
+				currentCheckbox.addEventListener("click", selectCheckbox);
 				i--;
 				points++;
 			}
@@ -112,20 +126,7 @@ function ballotSetup() {
 			for (var i = 0; i < (rangeBallot.children.length); i++) {
 				var candidateContainer = rangeBallot.children[i];
 				addMultipleCheckboxes(candidateContainer, 5);
-				setupRangeValues(candidateContainer);
-			}
-
-			function setupRangeValues(candidateContainer) {
-				var rangeBoxes = {};
-				for (var i = 0; i < candidateContainer.children.length; i++) {
-					if (candidateContainer.children[i].classList.contains('checkbox')) {
-						//console.log(candidateContainer.children[i]);
-						//rangeBoxes.candidates += candidateContainer.children[i];
-					}
-				}
-
-				//console.log(rangeBoxes);
-				//console.log(candidateContainer.children);
+				candidateContainer.setAttribute("data-selection-made", false);
 			}
 		}
 
@@ -168,7 +169,6 @@ function updateCandidateScores(data) {
 
 function pageSetup() {
 	ballotSetup();
-	addEventListeners();
 }
 
 pageSetup();
