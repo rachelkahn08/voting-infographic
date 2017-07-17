@@ -47,4 +47,32 @@
 		padding: 20px;
 		text-align: center;
 	}
+
+	&.rank {
+
+		.candidate {
+			width: 15vw;
+			height: 15vw;
+			margin: 0;
+			border: 1px solid black;
+			border-radius: 50%;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			text-align: center;
+		}
+
+		.ranking-boxes-container {
+			display: flex;
+			flex-direction: row;
+			justify-content: space-around;
+			width: 100%;
+		}
+
+		.ranking-box {
+			width: 20vw;
+			height: 20vw;
+			border: 1px solid black;
+		}
+	}
 }

@@ -31,7 +31,7 @@ function toggleCheckbox(checkbox) {
 	for (var i = 0; i < checkboxContainer.children.length; i++) {
 		var currentCheckbox = checkboxContainer.children[i];
 		if (currentCheckbox.dataset.points = 1) {
-			currentCheckbox.setAttribute("data-points", 0)
+			currentCheckbox.setAttribute("data-points", 0);
 		}
 	}
 
@@ -57,15 +57,15 @@ function ballotSetup() {
 		
 		candidates = [
 			{
-				candidateID: 'candidateA',
+				candidateId: 'candidateA',
 				candidateDisplay: 'Candidate A'
 			}, 
 			{
-				candidateID: 'candidateB', 
+				candidateId: 'candidateB', 
 				candidateDisplay: 'Candidate B'
 			},
 			{
-				candidateID: 'candidateC', 
+				candidateId: 'candidateC', 
 				candidateDisplay: 'Candidate C'
 			}
 		];
@@ -73,9 +73,9 @@ function ballotSetup() {
 		for (var i = 0; i < candidates.length; i++) {
 			var candidateContainer = document.createElement('div');
 				candidateContainer.classList.add('candidate');
-			var candidateID = candidates[i].candidateID;
-				candidateContainer.classList.add(candidateID);
-				candidateContainer.setAttribute('data-candidate-ID', candidateID);
+			var candidateId = candidates[i].candidateId;
+				candidateContainer.classList.add(candidateId);
+				candidateContainer.setAttribute('data-candidate-id', candidateId);
 				candidateContainer.setAttribute('data-points', 0);
 			
 			var candidateName = document.createElement('div');
@@ -92,7 +92,7 @@ function ballotSetup() {
 		}
 
 		if (ballot.classList.contains('rank')) {
-			setupRankingBallot(ballot);
+			setupRankedBallot(ballot);
 		} else if (ballot.classList.contains('range')) {
 			setupRangeBallot(ballot);
 		}
@@ -118,8 +118,23 @@ function ballotSetup() {
 			}
 		}
 
-		function setupRankingBallot(rankedBallot) {
-			//console.log(rankedBallot);
+		function setupRankedBallot(rankedBallot) {
+			var firstCandidate = rankedBallot.firstChild;
+			var rankingBoxesContainer = document.createElement('div');
+				rankingBoxesContainer.classList.add("ranking-boxes-container");
+				var firstPlaceContainer = document.createElement('div');
+					firstPlaceContainer.setAttribute("data-rank", 1);
+					firstPlaceContainer.classList.add("ranking-box");
+				var secondPlaceContainer = document.createElement('div');
+					secondPlaceContainer.setAttribute("data-rank", 2);
+					secondPlaceContainer.classList.add("ranking-box");
+				var thirdPlaceContainer = document.createElement('div');
+					thirdPlaceContainer.setAttribute("data-rank", 3);
+					thirdPlaceContainer.classList.add("ranking-box");
+				rankingBoxesContainer.appendChild(firstPlaceContainer);
+				rankingBoxesContainer.appendChild(secondPlaceContainer);
+				rankingBoxesContainer.appendChild(thirdPlaceContainer);
+			rankedBallot.insertBefore(rankingBoxesContainer, firstCandidate);
 		}
 
 		function setupRangeBallot(rangeBallot) {
@@ -138,33 +153,70 @@ function ballotSetup() {
 }
 
 function submitBallot() {
+	this.removeEventListener("click", submitBallot);
+	this.innerHTML = "Submitted!";
 
 	var ballot = this.parentElement;
-	var ballotOptions = ballot.children;
+	var candidates = ballot.children;
 	var ballotData = {};
+	//var candidate;
 
 	if (ballot.classList.contains("fptp")) {
+		disableClicks(ballot);
 		ballotData.ballotType = "fptp";
+		for (var i = 0; i < ballot.children.length; i++) {
+			if (ballot.children[i].dataset.points == 1) {
+				ballotData.candidateId = ballot.children[i].dataset.candidateId;
+				ballotData.points = 1;
+				updateCandidateScores(ballotData);
+			}
+		}
 	} else if (ballot.classList.contains("rank")) {
 		ballotData.ballotType = "rank";
+		extractPoints(ballot, ballotData);
 	} else if (ballot.classList.contains("range")) {
-		ballotData.ballotType = "range";
+		for (var i = 0; i < ballot.children.length; i++) {
+			disableClicks(ballot.children[i]);
+		}
+		ballotData = extractRangePoints(ballot, ballotData);
 	}
+}
 
-	for (var i = 0; i < ballotOptions.length; i++) {
-		var points = ballotOptions[i].dataset.points;
-		var candidate = ballotOptions[i].dataset.candidateId;
-		
-		if (points > 0) {
-			ballotData.candidateId = candidate;
-			ballotData.points = points;
+function extractRangePoints(ballot, data) {
+	var candidates = ballot.children;
+
+	var ballotData = {};
+	var candidateId; 
+
+	for (var i = 0; i < candidates.length; i++) {
+		if (!candidates[i].classList.contains("submit")) {
+			ballotData.ballotType = 'range';
+			ballotData.candidateId = candidates[i].dataset.candidateId;
+			ballotData.points = updatePoints(candidates[i]);
 			updateCandidateScores(ballotData);
+		}
+	}
+	
+	function updatePoints(candidate) {
+		for (var i = 0; i < candidate.children.length; i++) {
+			if (candidate.children[i].classList.contains("active")) {
+				var points = candidate.children[i].dataset.points;
+				return points;
+			}
 		}
 	}
 }
 
 function updateCandidateScores(data) {
 	console.log(data);
+}
+
+function disableClicks(ballot) {
+	var checkboxes;
+
+	for (var i = 0; i < ballot.children.length; i++) {
+		ballot.children[i].removeEventListener("click", selectCheckbox);
+	}
 }
 
 function pageSetup() {

@@ -24,6 +24,7 @@
     "jshint-stylish": "^2.2.1",
     "rename": "^1.0.4",
     "scss": "^0.2.4",
+    "sortablejs": "^1.6.0",
     "uglify": "^0.1.5"
   },
   "scripts": {
