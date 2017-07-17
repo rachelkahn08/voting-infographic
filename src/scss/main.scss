@@ -22,9 +22,22 @@
 			border: 1px solid black;
 			border-radius: 50%;
 
-			&.active {
-				background-color: black;
+			&.range-checkbox {
+				color: black;
+				border-radius: 0;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+
+				&.active {
+					color: white;
+					background-color: black;
+				}
 			}
+		}
+
+		&.active .checkbox {
+			background-color: black;
 		}
 	}
 
